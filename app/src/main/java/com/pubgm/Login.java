@@ -38,6 +38,11 @@ import top.Vspace.blackbox.entity.pm.InstallResult;
 
 @Obfuscate
 public class Login {
+
+    // ===== OFFLINE MODE (temporary) =====
+    // When true, login succeeds locally without any server check.
+    // Set to false to restore online license verification.
+    public static final boolean OFFLINE_MODE = true;
     
     static {
         try {
@@ -149,6 +154,23 @@ public class Login {
     }
 
     public static String check(Context context, String userKey) {
+        // ===== OFFLINE LOGIN (temporary) : accept any key locally =====
+        if (OFFLINE_MODE) {
+            try {
+                EXP = "lifetime";
+                rng = System.currentTimeMillis() / 1000;
+                g_Token = (userKey != null ? userKey : "offline") + "-offline-token";
+                g_Auth = g_Token;
+                bValid = true;
+                // Best-effort sync to native layer (ignore if lib not loaded)
+                try { setAuth(g_Token, g_Auth); } catch (Throwable ignored) {}
+                try { setExpire(EXP); } catch (Throwable ignored) {}
+                try { setAuthToken(g_Token); } catch (Throwable ignored) {}
+                return "OK";
+            } catch (Exception e) {
+                return "OK";
+            }
+        }
         try {
             retry = 0;
             while (isUnsafeNetwork(context)) {

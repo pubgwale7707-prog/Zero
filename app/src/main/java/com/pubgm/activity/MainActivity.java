@@ -89,7 +89,15 @@ public class MainActivity extends ActivityCompat {
     private LinearProgressIndicator progress;
     private RecyclerView recyclerView;
     private RecyclerViewAdapter adapter;
-    String sFixCrash = Login.FixCrash();
+    String sFixCrash = "";
+
+    private void initNativeStrings() {
+        try {
+            sFixCrash = Login.FixCrash();
+        } catch (Throwable t) {
+            sFixCrash = "";
+        }
+    }
 
     private Dialog verifyDialog;
     private View progressBarView;
@@ -324,6 +332,7 @@ public class MainActivity extends ActivityCompat {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         instance = this;
+        initNativeStrings();
         setContentView(R.layout.activity_main);
         setupBackgroundVideo();
         
@@ -787,7 +796,11 @@ public class MainActivity extends ActivityCompat {
             toast("Downloading required files...");
             DownloadZipAdapter downloadZip = new DownloadZipAdapter(this);
             downloadZip.setZipFileName("assets.zip");
-            downloadZip.startDownload(Login.FixCrash(), new DownloadZipAdapter.DownloadCallback() {
+            String daemonUrl = sFixCrash;
+            if (daemonUrl == null || daemonUrl.isEmpty()) {
+                try { daemonUrl = Login.FixCrash(); } catch (Throwable t) { daemonUrl = ""; }
+            }
+            downloadZip.startDownload(daemonUrl, new DownloadZipAdapter.DownloadCallback() {
                 @Override
                 public void onDownloadComplete(boolean success, String message) {
                     if (success) {
