@@ -293,13 +293,14 @@ public class LoginActivity extends ActivityCompat {
             usernameInput.setError("License key required");
             return;
         }
-        
-        if (key.length() < 6) {
+
+        // OFFLINE MODE: any non-empty key is accepted (length check disabled for now)
+        if (!Login.OFFLINE_MODE && key.length() < 6) {
             Toast.makeText(this, "Invalid license key", Toast.LENGTH_SHORT).show();
             usernameInput.setError("Invalid key");
             return;
         }
-        
+
         performLogin(key);
     }
 

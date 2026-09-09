@@ -15,7 +15,12 @@ public class SecurityUtils {
     // Hardcoded allowed signature hash (SHA-256)
     private static final String ALLOWED_SIGNATURE = "C6288994EE727D59DD2B3CE0E5DD206E0FF815BAC13AFD7F611420DEE89A2FA7";
 
+    // ===== OFFLINE MODE (temporary) : skip integrity checks for now =====
+    // Set to false to restore signature/root/debugger/emulator checks.
+    public static final boolean OFFLINE_MODE = true;
+
     public static boolean checkIntegrity(Context context) {
+        if (OFFLINE_MODE) return true;
         return checkSignature(context) && !isRooted() && !isDebuggerAttached() && !isEmulator();
     }
 
